@@ -11,10 +11,24 @@ import socket
 import ssl
 import threading
 import time
+from typing import Any, TypedDict
 
 from pki import ca as pki
 
 HOST = "127.0.0.1"
+
+
+class HandshakeResult(TypedDict, total=False):
+    ok: bool
+    mutual_tls: bool
+    error: str
+    protocol_version: str | None
+    cipher_suite: tuple[str, str, int] | None
+    server_cn: Any
+    client_cn: Any
+    server_reply: str
+    port_used: int
+    server_saw_client_cert: bool
 
 
 def _chain_file(cert_id, reg):
@@ -61,9 +75,9 @@ def run_handshake(server_cert_id, client_cert_id=None, port=0, timeout=5):
         server_ctx.verify_mode = ssl.CERT_REQUIRED
         server_ctx.load_verify_locations(cafile=ca_bundle)
 
-    result = {"ok": False, "mutual_tls": mutual}
+    result: HandshakeResult = {"ok": False, "mutual_tls": mutual}
     ready = threading.Event()
-    server_state = {}
+    server_state: dict[str, Any] = {}
 
     def server_thread(sock):
         try:
@@ -105,15 +119,15 @@ def run_handshake(server_cert_id, client_cert_id=None, port=0, timeout=5):
             with client_ctx.wrap_socket(raw_client, server_hostname="localhost") as tls_client:
                 tls_client.send(b"Hello from Tendaji TLS client")
                 reply = tls_client.recv(1024)
-                result.update({
-                    "ok": True,
-                    "protocol_version": tls_client.version(),
-                    "cipher_suite": tls_client.cipher(),
-                    "server_cn": server_entry["cn"],
-                    "client_cn": reg["certs"][client_cert_id]["cn"] if mutual else None,
-                    "server_reply": reply.decode(errors="replace"),
-                    "port_used": bound_port,
-                })
+                result["ok"] = True
+                result["protocol_version"] = tls_client.version()
+                result["cipher_suite"] = tls_client.cipher()
+                result["server_cn"] = server_entry["cn"]
+                result["client_cn"] = (
+                    reg["certs"][client_cert_id]["cn"] if client_cert_id is not None else None
+                )
+                result["server_reply"] = reply.decode(errors="replace")
+                result["port_used"] = bound_port
     except ssl.SSLError as e:
         result["error"] = f"TLS handshake failed: {e}"
     except Exception as e:

@@ -1,9 +1,4 @@
-"""
-pki/ca.py
-Builds a two-tier PKI hierarchy: Root CA -> Intermediate CA -> Leaf certs.
-All key material lives under data/ as PEM files so the whole hierarchy can be
-inspected with plain `openssl` commands too, not just this app.
-"""
+
 import datetime
 import ipaddress
 import json

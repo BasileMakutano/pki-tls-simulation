@@ -1,9 +1,4 @@
-"""
-pki/validator.py
-Independent validation engine. Deliberately does NOT rely on Python's ssl
-module for trust decisions - it walks the chain itself so every check is
-visible and explainable, which is the point of the assignment.
-"""
+
 import datetime
 import os
 
@@ -25,11 +20,6 @@ def _step(name, ok, detail):
 
 
 def validate_chain(cert_id):
-    """
-    Walks cert -> intermediate -> root, running an explicit checklist at
-    each hop. Returns a structured report the dashboard can render as a
-    step-by-step timeline.
-    """
     reg = pki.get_registry()
     if cert_id not in reg["certs"]:
         return {"valid": False, "steps": [_step("lookup", False, f"No such certificate: {cert_id}")]}

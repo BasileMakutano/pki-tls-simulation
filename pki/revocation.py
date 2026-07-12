@@ -1,9 +1,4 @@
-"""
-pki/revocation.py
-Minimal CRL (Certificate Revocation List) management, signed by the
-Intermediate CA. This models real-world revocation checking without
-standing up a full OCSP responder.
-"""
+
 import datetime
 import json
 import os

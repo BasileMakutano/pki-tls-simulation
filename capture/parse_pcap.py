@@ -1,14 +1,4 @@
 #!/usr/bin/env python3
-"""
-parse_pcap.py
-Reads a pcap captured by capture_traffic.sh and produces a human-readable
-TLS handshake summary: ClientHello, ServerHello, Certificate exchange,
-negotiated cipher suite, and a plain packet count. Uses tshark as a
-subprocess (no extra Python deps needed on Kali - tshark ships with
-Wireshark).
-
-Usage: python3 parse_pcap.py capture.pcap
-"""
 import json
 import subprocess
 import sys

@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-# capture_traffic.sh
-# Captures the loopback TLS handshake produced by the "Run TLS Test" button
-# in the dashboard. Must be run with sudo (packet capture needs raw socket
-# access), and started BEFORE you click "Run TLS Test" in the browser.
-#
-# Usage:
-#   sudo ./capture_traffic.sh [output.pcap] [duration_seconds]
-#
-# Then open the pcap in Wireshark, or run parse_pcap.py for a text summary,
-# or upload it in the dashboard's "Wireshark Capture" panel.
 
 set -e
 
@@ -32,8 +22,6 @@ echo "Filter: tcp port range 1024-65535 restricted to TLS handshake records."
 echo
 
 # capture filter narrows to loopback TCP traffic; the app binds an ephemeral
-# port each run, so we can't pin an exact port here - filter in Wireshark
-# afterwards with: tls.handshake or tcp.port == <port shown in dashboard>
 timeout "${DURATION}" tshark -i "${IFACE}" -f "tcp" -w "${OUT}" || true
 
 echo

@@ -77,8 +77,12 @@ def cert_detail(cert_id):
     for ext in cert.extensions:
         ext_list.append({"oid": ext.oid._name if hasattr(ext.oid, "_name") else str(ext.oid), "critical": ext.critical, "value": str(ext.value)})
 
-    not_before = getattr(cert, "not_valid_before_utc", cert.not_valid_before)
-    not_after = getattr(cert, "not_valid_after_utc", cert.not_valid_after)
+    if hasattr(cert, "not_valid_before_utc"):
+        not_before = cert.not_valid_before_utc
+        not_after = cert.not_valid_after_utc
+    else:
+        not_before = cert.not_valid_before
+        not_after = cert.not_valid_after
 
     return jsonify({
         "ok": True,
