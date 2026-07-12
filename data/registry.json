@@ -1,0 +1,36 @@
+{
+  "certs": {
+    "root-ca": {
+      "id": "root-ca",
+      "role": "root",
+      "cn": "Tendaji Root CA",
+      "serial": "629385084309645766120036838414466750729867179850",
+      "key_path": "root/root.key",
+      "cert_path": "root/root.crt",
+      "issuer_id": null,
+      "revoked": false
+    },
+    "intermediate-ca": {
+      "id": "intermediate-ca",
+      "role": "intermediate",
+      "cn": "Tendaji Intermediate CA",
+      "serial": "247577172043539220300317621166469536255406034535",
+      "key_path": "intermediate/intermediate.key",
+      "cert_path": "intermediate/intermediate.crt",
+      "issuer_id": "root-ca",
+      "revoked": false
+    }
+  },
+  "events": [
+    {
+      "ts": "2026-07-12T17:02:28.799409Z",
+      "level": "info",
+      "message": "Root CA generated (RSA-4096, self-signed, 10yr validity)."
+    },
+    {
+      "ts": "2026-07-12T17:02:29.091579Z",
+      "level": "info",
+      "message": "Intermediate CA generated and signed by Root CA (RSA-3072)."
+    }
+  ]
+}

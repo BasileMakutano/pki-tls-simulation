@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tendaji PKI Registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="eyebrow">Mini Certificate Authority &middot; Chain Validation &middot; Live TLS</span>
+    <h1>Tendaji PKI Registry</h1>
+  </div>
+  <div class="actions">
+    <button id="btnInit" class="btn btn-gold">Initialize PKI</button>
+    <button id="btnIssue" class="btn btn-ghost" disabled>Issue Certificate</button>
+    <button id="btnTlsPanel" class="btn btn-ghost" disabled>Live TLS Test</button>
+    <button id="btnCapturePanel" class="btn btn-ghost">Wireshark Capture</button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- Ledger / hierarchy sidebar -->
+  <aside class="ledger">
+    <div class="ledger-head">
+      <span class="ledger-num">Chain of Custody</span>
+    </div>
+    <div id="ledgerTree" class="ledger-tree">
+      <p class="empty-note">No hierarchy yet. Click <strong>Initialize PKI</strong> to generate the Root and Intermediate CA.</p>
+    </div>
+  </aside>
+
+  <!-- Main document + validation area -->
+  <section class="stage">
+
+    <div id="certDocument" class="cert-doc empty">
+      <div class="cert-doc-empty-state">
+        <div class="seal-outline"></div>
+        <p>Select a certificate from the chain of custody to inspect it here.</p>
+      </div>
+    </div>
+
+    <div id="validationPanel" class="validation-panel hidden">
+      <div class="panel-head">
+        <span class="panel-num">01</span>
+        <h2>Validation Timeline</h2>
+        <button id="btnValidate" class="btn btn-teal">Run Validation</button>
+      </div>
+      <ol id="validationSteps" class="validation-steps"></ol>
+    </div>
+
+  </section>
+
+  <!-- Event log -->
+  <aside class="log-console">
+    <div class="ledger-head"><span class="ledger-num">Registry Log</span></div>
+    <div id="logList" class="log-list"></div>
+  </aside>
+
+</main>
+
+<!-- Issue certificate modal -->
+<div id="issueModal" class="modal hidden">
+  <div class="modal-card">
+    <h3>Issue Leaf Certificate</h3>
+    <label>Type
+      <select id="issueType">
+        <option value="server">Server (TLS endpoint)</option>
+        <option value="client">Client (mutual TLS)</option>
+      </select>
+    </label>
+    <label>Common Name (CN)
+      <input id="issueCn" type="text" placeholder="e.g. api.tendaji.local">
+    </label>
+    <label>Subject Alt Names (server only, comma separated)
+      <input id="issueSans" type="text" placeholder="localhost, api.tendaji.local">
+    </label>
+    <div class="modal-actions">
+      <button id="issueCancel" class="btn btn-ghost">Cancel</button>
+      <button id="issueSubmit" class="btn btn-gold">Issue Certificate</button>
+    </div>
+  </div>
+</div>
+
+<!-- TLS test modal -->
+<div id="tlsModal" class="modal hidden">
+  <div class="modal-card">
+    <h3>Live TLS Handshake Test</h3>
+    <p class="modal-sub">Runs a real TLS socket handshake on 127.0.0.1 using the certificates you issued.</p>
+    <label>Server certificate
+      <select id="tlsServerSelect"></select>
+    </label>
+    <label class="checkbox-row">
+      <input id="tlsMutual" type="checkbox">
+      Require mutual TLS (server verifies client certificate)
+    </label>
+    <label id="tlsClientRow" class="hidden">Client certificate
+      <select id="tlsClientSelect"></select>
+    </label>
+    <div class="modal-actions">
+      <button id="tlsCancel" class="btn btn-ghost">Cancel</button>
+      <button id="tlsRun" class="btn btn-teal">Run Handshake</button>
+    </div>
+    <div id="tlsResult" class="tls-result hidden"></div>
+  </div>
+</div>
+
+<!-- Wireshark capture modal -->
+<div id="captureModal" class="modal hidden">
+  <div class="modal-card wide">
+    <h3>Wireshark Capture &amp; Analysis</h3>
+    <p class="modal-sub">
+      The handshake happens on this machine's real loopback interface, so it is genuinely
+      capturable. On your Kali box, run the capture script with sudo, click <strong>Run TLS Test</strong>
+      while it's capturing, then upload the resulting .pcap here for a parsed summary.
+    </p>
+    <ol class="capture-steps">
+      <li>Download <code>capture_traffic.sh</code> below and place it next to this app.</li>
+      <li><code>sudo ./capture_traffic.sh handshake.pcap 20</code></li>
+      <li>Within those 20s, trigger <strong>Live TLS Test</strong> in another tab/terminal.</li>
+      <li>Upload <code>handshake.pcap</code> here, or open it directly in Wireshark.</li>
+    </ol>
+    <a id="downloadScript" class="btn btn-ghost" href="/api/capture/script">Download capture_traffic.sh</a>
+    <label class="file-row">Upload captured .pcap for analysis
+      <input id="pcapUpload" type="file" accept=".pcap,.pcapng">
+    </label>
+    <pre id="pcapOutput" class="pcap-output hidden"></pre>
+    <div class="modal-actions">
+      <button id="captureClose" class="btn btn-ghost">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
