@@ -1,11 +1,4 @@
-"""
-tls/handshake_test.py
-Spins up a REAL TLS 1.3 server on localhost using the generated server cert,
-and a real client that connects to it - optionally with mutual TLS (the
-client also presents a cert, and the server verifies it). This is not
-simulated: it is an actual socket-level handshake you can capture in
-Wireshark on loopback (see capture/capture_traffic.sh).
-"""
+
 import os
 import socket
 import ssl
@@ -52,11 +45,7 @@ def _ca_bundle():
 
 
 def run_handshake(server_cert_id, client_cert_id=None, port=0, timeout=5):
-    """
-    Returns a result dict describing the negotiated handshake, or an error.
-    If client_cert_id is given, mutual TLS is used and the server verifies
-    the client certificate against the CA bundle too.
-    """
+  
     reg = pki.get_registry()
     if server_cert_id not in reg["certs"]:
         return {"ok": False, "error": f"Unknown server cert id {server_cert_id}"}
